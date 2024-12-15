@@ -73,16 +73,27 @@ export const createPlantPost = async (req, res) => {
 };
 
 
+
 export const getAllPlantPosts = async (req, res) => {
   try {
     const posts = await PlantPost.find()
-      .populate("createdBy", "username")
       .sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+export const getPlantPostByUser = async(req,res)=>{
+  try {
+    const post = await PlantPost.find({
+      createdBy: req.body.userId
+    });
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(500).json({message:"Server error ",error:error.message})
+  }
+}
 
 export const getPlantPostById = async (req, res) => {
   try {

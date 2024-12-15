@@ -5,6 +5,7 @@ import {
   deletePlantPost,
   getAllPlantPosts,
   getPlantPostById,
+  getPlantPostByUser,
   updatePlantPost,
 } from "../controllers/plantPost.controller.js";
 import multer from "multer";
@@ -14,7 +15,7 @@ const router = express.Router();
 router
   .route("/plant-posts")
   .post(upload.single('image'), userAuth, createPlantPost)
-  .get(userAuth, getAllPlantPosts)
+  .get(userAuth, getPlantPostByUser)
   
 router.get("/all-posts",getAllPlantPosts);
 

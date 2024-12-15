@@ -2,9 +2,9 @@ import mongoose from 'mongoose'
 
 const plantPostSchema = new mongoose.Schema({
   createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+    type:mongoose.Schema.Types.ObjectId,
+    ref: 'User', 
+    required: true
   },
   plantName: {
     type: String,
@@ -14,7 +14,7 @@ const plantPostSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  imageUrl: {
+  image: {
     type: String, 
     required: true,
   },
@@ -22,7 +22,10 @@ const plantPostSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-  placeName: { type: String, required: true },
+  placeName: { 
+    type: String, 
+    required: true 
+  },
   location: {
     type: {
       type: String, // 'Point'
@@ -35,9 +38,26 @@ const plantPostSchema = new mongoose.Schema({
     }
   },
   category: {
-    type: String,
+    type: [String],
     required: true, 
-    enum: ["Succulents", "Herbs", "Trees", "Flowers", "Others"], 
+    enum: [
+      "Succulents", 
+      "Herbs", 
+      "Trees", 
+      "Flowers", 
+      "Indoor Plants",
+      "Outdoor Plants",
+      "Medicinal Plants",
+      "Climbers",
+      "Creepers",
+      "Desert Plants",
+      "Shrubs",
+      "Grasses",
+      "Fruit Plants",
+      "Vegetable Plants",
+      "Tropical Plants",
+      "Evergreen Plants",
+      "Others"], 
   },
   tags: {
     type: [String], 

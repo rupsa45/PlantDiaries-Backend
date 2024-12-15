@@ -7,18 +7,19 @@ import {
   getPlantPostById,
   updatePlantPost,
 } from "../controllers/plantPost.controller.js";
-
+import multer from "multer";
+const upload=multer();
 const router = express.Router();
 
 router
   .route("/plant-posts")
-  .post(userAuth, createPlantPost)
+  .post(upload.single('image'), userAuth, createPlantPost)
   .get(userAuth, getAllPlantPosts);
 
 router
   .route("/plant-posts/:id")
-  .get(userAuth,getPlantPostById)
-  .put(userAuth, updatePlantPost)
-  .delete(userAuth,deletePlantPost)
+  .get(userAuth, getPlantPostById)
+  .put(userAuth, upload.single("image"), updatePlantPost)
+  .delete(userAuth, deletePlantPost);
 
 export default router;

@@ -1,72 +1,75 @@
 import PlantPost from "../models/plantPost.models.js";
-import cloudinary from "cloudinary";
+import cloudinary from 'cloudinary';
 
 const uploadImage = async (file) => {
   try {
-    // Convert the file buffer to a base64 string
-    const base64Image = file.buffer.toString("base64");
-    const dataURI = `data:${file.mimetype};base64,${base64Image}`;
-
-    // Upload the image to Cloudinary
+    const image = file;
+    const base64Image = Buffer.from(image.buffer).toString('base64');
+    const dataURI = `data:${image.mimetype};base64,${base64Image}`;
     const uploadResponse = await cloudinary.v2.uploader.upload(dataURI);
-
-    // Return the image URL
-    return uploadResponse.secure_url; // 'secure_url' provides a HTTPS link
+    return uploadResponse.url;  
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error uploading image to Cloudinary",
-        error: error.message,
-      });
+    console.error("Error uploading image to Cloudinary:", error.message);
+    throw new Error('Error uploading image');
   }
 };
 
 export const createPlantPost = async (req, res) => {
   try {
-    const {plantName,aboutPlant,userId,placeName,latitude,longitude,category,contactEmail,tags} = req.body;
-    switch(true){
-      case !plantName :
-        return res.status(400).json({message:"Plant name is required"})
+    const { plantName, aboutPlant, placeName, latitude, longitude, category, contactEmail, tags } = req.body;
+    switch (true) {
+      case !plantName:
+        return res.status(400).json({ message: "Plant name is required" });
+  
       case !aboutPlant:
-        return res.status(400).json({message:"Description is required"})
+        return res.status(400).json({ message: "About plant information is required" });
+  
       case !placeName:
-        return res.status(400).json({message:"placename is required"})
+        return res.status(400).json({ message: "Place name is required" });
+  
       case !latitude:
-        return res.status(400).json({message:"Latitude is required"})
+        return res.status(400).json({ message: "Latitude is required" });
+  
       case !longitude:
-        return res.status(400).json({message:"Longitude is required"})
+        return res.status(400).json({ message: "Longitude is required" });
+  
       case !category:
-        return res.status(400).json({message:"Category is required"})
+        return res.status(400).json({ message: "Category is required" });
+  
       case !contactEmail:
-        return res.status(400).json({message:"ContactEmail is required"})
-  }
+        return res.status(400).json({ message: "Contact email is required" });
 
-    let image = await uploadImage(req.file);
-    const plantPost = await PlantPost.create({
-      createdBy: userId, // req.user is populated via middleware
-      plantName,
-      aboutPlant,
-      imageUrl:image,
-      placeName,
-      category,
-      tags,
-      contactEmail,
-      location: {
-        type: "Point",
-        coordinates: [longitude, latitude], // Note: Longitude first
-      },
-    });
-    res.status(201).json({
-      message: "Plant post created successfully",
-      post: plantPost,
-    });
+    }
+    const userId = req.body.userId;
+    if (!userId) return res.status(400).json({ message: "User not authenticated" });
+    let imageUrl;
+    if (req.file) {
+      imageUrl = await uploadImage(req.file);
+    }
+      const plantPost = await PlantPost.create({
+        createdBy: userId,
+        plantName,
+        aboutPlant,
+        image: imageUrl,
+        placeName,
+        location: {
+          type: "Point",
+          coordinates: [longitude, latitude], // Longitude first
+        },
+        category,
+        tags,
+        contactEmail,
+      });
+      return res.status(201).json({
+        message: "Plant post created successfully",
+        post: plantPost,
+      });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-    console.log(error);
-    
+    console.error(error);
+    return res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 export const getAllPlantPosts = async (req, res) => {
   try {
@@ -116,7 +119,7 @@ export const updatePlantPost = async (req, res) => {
     if (placeName) post.placeName = placeName;
     if (req.file) {
       let newImageUrl = await uploadImage(req.file); 
-      post.imageUrl = newImageUrl;
+      post.image = newImageUrl;
     }
     if (latitude && longitude) {
       post.location = {

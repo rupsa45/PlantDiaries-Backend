@@ -16,7 +16,7 @@ const uploadImage = async (file) => {
 
 export const createPlantPost = async (req, res) => {
   try {
-    const { plantName, aboutPlant, placeName, latitude, longitude, category, contactEmail, tags } = req.body;
+    const { plantName, aboutPlant, placeName, latitude, longitude, contactEmail, tags } = req.body;
     switch (true) {
       case !plantName:
         return res.status(400).json({ message: "Plant name is required" });
@@ -33,8 +33,8 @@ export const createPlantPost = async (req, res) => {
       case !longitude:
         return res.status(400).json({ message: "Longitude is required" });
   
-      case !category:
-        return res.status(400).json({ message: "Category is required" });
+      // case !category:
+      //   return res.status(400).json({ message: "Category is required" });
   
       case !contactEmail:
         return res.status(400).json({ message: "Contact email is required" });
@@ -46,7 +46,7 @@ export const createPlantPost = async (req, res) => {
     if (req.file) {
       imageUrl = await uploadImage(req.file);
     }
-      const plantPost = await PlantPost.create({
+      const plantPost =  new PlantPost({
         createdBy: userId,
         plantName,
         aboutPlant,
@@ -56,13 +56,15 @@ export const createPlantPost = async (req, res) => {
           type: "Point",
           coordinates: [longitude, latitude], // Longitude first
         },
-        category,
+        // category,
         tags,
         contactEmail,
       });
+      const savedPost = await plantPost.save();
       return res.status(201).json({
         message: "Plant post created successfully",
         post: plantPost,
+        postId: savedPost._id
       });
   } catch (error) {
     console.error(error);

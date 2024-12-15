@@ -14,7 +14,9 @@ const router = express.Router();
 router
   .route("/plant-posts")
   .post(upload.single('image'), userAuth, createPlantPost)
-  .get(userAuth, getAllPlantPosts);
+  .get(userAuth, getAllPlantPosts)
+  
+router.get("/all-posts",getAllPlantPosts);
 
 router
   .route("/plant-posts/:id")

@@ -73,7 +73,6 @@ export const createPlantPost = async (req, res) => {
 };
 
 
-
 export const getAllPlantPosts = async (req, res) => {
   try {
     const posts = await PlantPost.find()
@@ -154,6 +153,28 @@ export const deletePlantPost = async (req, res) => {
     const post = await PlantPost.findByIdAndDelete(req.params.id);
     res.json(post);
   } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const searchPlantPostsByPlaceName = async (req, res) => {
+  const { placeName } = req.params;
+  const { latitude, longitude } = req.query;
+
+  try {
+    // Add your search logic here using placeName, latitude, and longitude
+    const posts = await PlantPost.find({
+      placeName: { $regex: new RegExp(`^${placeName}$`, "i") },// Matches the provided placeName
+      location: {
+        $near: {
+          $geometry: { type: "Point", coordinates: [parseFloat(longitude), parseFloat(latitude)] },
+          $maxDistance: 5000, // Maximum distance in meters (5 km)
+        },
+      },
+    });
+    res.status(200).json({ posts });
+  } catch (error) {
+    console.error("Error searching plant posts:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };

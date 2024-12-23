@@ -16,7 +16,7 @@ const uploadImage = async (file) => {
 
 export const createPlantPost = async (req, res) => {
   try {
-    const { plantName, aboutPlant, placeName, latitude, longitude, contactEmail, tags } = req.body;
+    const { plantName, aboutPlant, placeName, latitude, longitude,  tags } = req.body;
     switch (true) {
       case !plantName:
         return res.status(400).json({ message: "Plant name is required" });
@@ -36,8 +36,8 @@ export const createPlantPost = async (req, res) => {
       // case !category:
       //   return res.status(400).json({ message: "Category is required" });
   
-      case !contactEmail:
-        return res.status(400).json({ message: "Contact email is required" });
+      // case !contactEmail:
+      //   return res.status(400).json({ message: "Contact email is required" });
 
     }
     const userId = req.body.userId;
@@ -58,7 +58,7 @@ export const createPlantPost = async (req, res) => {
         },
         // category,
         tags,
-        contactEmail,
+        //contactEmail,
       });
       const savedPost = await plantPost.save();
       return res.status(201).json({
@@ -83,6 +83,7 @@ export const getAllPlantPosts = async (req, res) => {
   }
 };
 
+
 export const getPlantPostByUser = async(req,res)=>{
   try {
     const post = await PlantPost.find({
@@ -96,7 +97,9 @@ export const getPlantPostByUser = async(req,res)=>{
 
 export const getPlantPostById = async (req, res) => {
   try {
-    const post = await PlantPost.findById(req.params.id);
+    const post = await PlantPost.findById(req.params.id)
+    .populate("createdBy", "name email phoneNumber") 
+    .exec();
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }

@@ -118,6 +118,7 @@ export const updatePlantPost = async (req, res) => {
       placeName,
       longitude,
       latitude,
+      tags
     } = req.body;
     const { id: postId } = req.params;
     const post = await PlantPost.findById(postId);
@@ -142,6 +143,7 @@ export const updatePlantPost = async (req, res) => {
         coordinates: [longitude, latitude],
       };
     }
+    if(tags) post.tags=tags;
     const updatedPost = await post.save();
     res
       .status(200)

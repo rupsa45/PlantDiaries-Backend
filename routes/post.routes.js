@@ -22,7 +22,7 @@ router.get("/all-posts", getAllPlantPosts);
 
 router
   .route("/plant-posts/:id")
-  .get(userAuth, getPlantPostById)
+  .get(getPlantPostById)
   .put(userAuth, upload.single("image"), updatePlantPost)
   .delete(userAuth, deletePlantPost);
 
